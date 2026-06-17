@@ -1,52 +1,65 @@
-# -Neon-Colapse-METABLOOM-
-1. Visão Geral do Sistema
-O sistema consiste na modelagem orientada a objetos de um jogo eletrônico interativo. A arquitetura central conecta o gerenciador principal do jogo às entidades controladas pelo usuário (Jogador) e aos sistemas de controle de fluxo de gameplay, como o ecossistema de missões e gerenciamento de combates.
+# Neon Collapse
 
-2. Descrição Detalhada das Classes e Arquitetura
-2.1. Núcleo do Jogo (Core)
-Jogo: É a classe que centraliza a execução do programa. Ela possui associações diretas com as três grandes frentes do sistema: o Jogador, o controlador de combates (Combate) e o sistema de gerenciamento de missões (Missao). Contém atributos e métodos para iniciar, pausar e encerrar o ciclo principal da aplicação.
+## 1. Visão Geral do Sistema
+O Neon Collapse é uma modelagem arquitetural baseada em Programação Orientada a Objetos (POO) para um jogo eletrônico interativo de RPG focado em turnos e testes de habilidade. 
 
-2.2. Entidades Reativas e Atributos de Combate
-Jogador: Representa a conta ou o perfil do usuário no jogo. Ele possui uma relação de composição/associação com a entidade ativa no mapa: o Personagem.
+A arquitetura central conecta o gerenciador principal do jogo às entidades controladas pelo usuário e aos subsistemas de controle de fluxo de gameplay, tais como o ecossistema de missões, gerenciamento de combates e testes dinâmicos de dados.
 
-Personagem: É o elemento central das mecânicas. Ele armazena os atributos principais de RPG (como vida, energia, inteligencia, agilidade, defesa e pontos_de_vida). Possui métodos essenciais como atacar(), defender(), usar_item(), e receber_dano().
+---
 
-Especializações de Personagem (Herança):
+## 2. Arquitetura e Descrição das Classes
 
-Hacker: Especialista com foco em inteligência e mecânicas específicas de invasão/técnicas digitais.
+### 2.1. Núcleo do Jogo (Core)
+* **Jogo**: Centraliza a execução do programa. Possui associações diretas com as três grandes frentes do sistema: o Jogador, o controlador de combates (Combate) e o sistema de gerenciamento de missões (Missao). Contém atributos e métodos para iniciar, avançar fases e encerrar o ciclo principal da aplicação.
+* **Dado**: Componente utilitário essencial do sistema que define as faces do dado (padrão de 6 faces) e encapsula a lógica de sorteio matemático.
+* **TesteHabilidade**: Modela a mecânica central do sistema. Instancia 3 dados, executa a soma dos valores e valida o sucesso contra o Nível de Habilidade (NH) do personagem.
 
-Atirador: Personagem voltado para dano à distância e agilidade.
+### 2.2. Entidades Reativas e Atributos de RPG
+* **Jogador**: Representa a conta ou o perfil do usuário na sessão, monitorando sua pontuação global e o controle sobre as ações do personagem.
+* **Personagem (Classe Abstrata)**: O elemento central das mecânicas. Armazena os atributos principais de RPG (Força, Inteligência, Saúde e Pontos de Vida) além dos Níveis de Habilidade específicos (nh_fisico e nh_mental).
 
-Mutante: Classe com atributos modificados de resistência física ou habilidades biológicas.
+#### Especializações de Personagem (Herança)
+| Classe | Foco Principal | Habilidades / Atributos Extras |
+| :--- | :--- | :--- |
+| **Hacker** | Invasão e Técnicas Digitais | nivel_hack, firewall, invadir_sistema(), hackear_drone() |
+| **Mercenário** | Combate Corporal e Resistência | armadura, nivel_raiva, golpe_brutal(), esquivar() |
+| **Mutante** | Atributos Equilibrados e Regeneração | tipo_mutacao, energia_mutante, ativar_mutacao(), regenerar() |
 
-Mercenario: Classe balanceada focada em combate direto e ganho de recursos.
+---
 
-2.3. Sistema de Inventário e Customização
-Inventario: Associado diretamente ao Personagem, armazena os pertences coletados ao longo do jogo. Ele contém uma agregação de itens.
+### 2.3. Sistema de Inventário e Customização
+* **Inventario**: Associado diretamente ao Personagem, gerencia os pertences coletados com controle rígido de capacidade máxima.
+* **Item (Classe Abstrata)**: Classe base que define propriedades de peso e descrição. Divide-se em três especializações:
+    * **Kit Médico**: Itens de cura imediata que restauram pontos de vida.
+    * **Implante Neural**: Modificadores temporários que ampliam os atributos mentais.
+    * **Arma**: Modificadores ofensivos que ampliam o poder de dano para o próximo ataque.
 
-Item: Classe abstrata ou base para os objetos do jogo. Divide-se em três especializações por herança:
+---
 
-Consumivel: Itens que concedem bônus temporários ou cura e desaparecem após o uso (ex: poções, kits médicos).
+### 2.4. Ciclo de Combate e Desafios
+* **Combate**: Gerencia os turnos, ordem de ação e o fluxo de interações hostis baseadas na fórmula: Dano = Força do Atacante - Defesa do Defensor (com dano mínimo de 1 ponto por acerto).
+* **Inimigo (Classe Abstrata)**: Classe base automatizada para os oponentes do jogo. Suas ramificações incluem:
+    * `DronePatrulha`: Fraco, age de forma rápida e em grupo.
+    * `SoldadoCorporativo`: Força média, equipado com proteção de armadura.
+    * `CiborgueDeElite`: Chefe de fase com alto balanço de força e inteligência.
+    * `NEXUS`: Chefe final (entidade digital), imune a ataques convencionais e vulnerável apenas a hacks e ataques mentais.
 
-Equipamento: Itens de modificação estética ou proteção que alteram os status do personagem de forma passiva.
+---
 
-Arma: Itens de ataque que modificam diretamente o poder ofensivo e os métodos de dano do portador.
+### 2.5. Missões e Progressão
+* **Missao**: Estrutura sequencial de objetivos necessários para progredir pelas fases da megacidade de Neo-Brasília.
+* **Objetivo**: Subunidades de validação atômica que determinam as condições de vitória ou conclusão de uma missão específica.
 
-2.4. Ciclo de Combate e Desafios
-Combate: Gerencia os turnos, ordem de ataque e fluxo de interações hostis entre o Personagem e os inimigos presentes na sessão.
+---
 
-Inimigo: Classe base para os oponentes do jogo. Assim como o personagem principal, possui atributos de combate, mas com comportamento automatizado. Divide-se em subclasses como:
+## 3. Mapeamento das Relações (Conceitos POO Utilizados)
 
-Chefe (Bosses com mais vida e padrões complexos).
+O projeto utiliza os pilares clássicos da Programação Orientada a Objetos para garantir escalabilidade e organização:
 
-InimigoPadrao, DroneDeDefesa, SoldadoCorporativo.
+* **Herança (Generalização/Especialização):** Demonstrada nitidamente na ramificação das classes derivadas de Personagem (Hacker, Atirador, Mutante, Mercenario), de Item (Consumivel, Arma, Equipamento) e de Inimigo.
+* **Associação e Composição:** O Jogo coordena as partes independentes, enquanto o Personagem detém a propriedade conceitual e o ciclo de vida de seu Inventario.
+* **Polimorfismo:** Métodos como atacar() ou usar_item() são herdados da classe mãe, permitindo que cada subclasse execute comportamentos totalmente distintos dependendo de sua especialização.
+* **Agregação:** O Inventario armazena e gerencia instâncias da classe Item, permitindo que os objetos existam de maneira independente do contêiner.
+* **Dependência:** O Personagem estabelece uma relação de dependência pontual com a classe TesteHabilidade, acionando-a apenas sob demanda para resolver ações de risco no cenário.
 
-2.5. Missões e Progressão
-Missao: Estrutura que dita os objetivos que o jogador deve cumprir para progredir na história e ganhar recompensas. Cada missão é composta por um ou mais Objetivos, que validam se as condições de vitória do cenário foram atingidas.
-
-3. Mapeamento das Relações (Conceitos POO Utilizados)
-Herança (Generalização/Especialização): Demonstrada nitidamente na ramificação das classes derivadas de Personagem (Hacker, Atirador, etc.), de Item (Consumivel, Arma, Equipamento) e de Inimigo.
-
-Associação e Composição: O Jogo coordena as partes independentes, enquanto o Personagem detém a propriedade conceitual de seu Inventario.
-
-Polimorfismo: Métodos como atacar() ou usar_habilidade() são herdados da classe mãe, permitindo que cada subclasse execute comportamentos totalmente distintos dependendo de sua especialização.
+---
